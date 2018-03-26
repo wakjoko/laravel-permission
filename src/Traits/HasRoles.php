@@ -59,7 +59,7 @@ trait HasRoles
                 return $role;
             }
 
-            return app(Role::class)->findByName($role, $this->getDefaultGuardName());
+            return app(Role::class)->findByName($role);
         }, $roles);
 
         return $query->whereHas('roles', function ($query) use ($roles) {
@@ -91,9 +91,6 @@ trait HasRoles
             })
             ->filter(function ($role) {
                 return $role instanceof Role;
-            })
-            ->each(function ($role) {
-                $this->ensureModelSharesGuard($role);
             })
             ->all();
 
@@ -218,11 +215,11 @@ trait HasRoles
     protected function getStoredRole($role): Role
     {
         if (is_numeric($role)) {
-            return app(Role::class)->findById($role, $this->getDefaultGuardName());
+            return app(Role::class)->findById($role);
         }
 
         if (is_string($role)) {
-            return app(Role::class)->findByName($role, $this->getDefaultGuardName());
+            return app(Role::class)->findByName($role);
         }
 
         return $role;
