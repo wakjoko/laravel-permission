@@ -2,6 +2,7 @@
 
 namespace Spatie\Permission\Test;
 
+use Illuminate\Support\Facades\Cache;
 use Spatie\Permission\Contracts\Role;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
@@ -81,7 +82,8 @@ abstract class TestCase extends Orchestra
             $table->softDeletes();
         });
 
-        if ($app[PermissionRegistrar::class]->getCacheStore() instanceof \Illuminate\Cache\DatabaseStore) {
+        if (Cache::getStore() instanceof \Illuminate\Cache\DatabaseStore ||
+            $app[PermissionRegistrar::class]->getCacheStore() instanceof \Illuminate\Cache\DatabaseStore) {
             $this->createCacheTable();
         }
 

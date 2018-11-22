@@ -217,6 +217,13 @@ return [
          */
 
         'model_key' => 'name',
+
+        /*
+         * You may optionally indicate a specific cache driver to use for permission and
+         * role caching using any of the `store` drivers listed in the cache.php config
+         * file. Using 'default' here means to use the `default` set in cache.php.
+         */
+        'store' => 'default',
     ],
 ];
 ```
@@ -232,6 +239,7 @@ composer require spatie/laravel-permission
 Copy the required files:
 
 ```bash
+mkdir -p config
 cp vendor/spatie/laravel-permission/config/permission.php config/permission.php
 cp vendor/spatie/laravel-permission/database/migrations/create_permission_tables.php.stub database/migrations/2018_01_01_000000_create_permission_tables.php
 ```
@@ -239,7 +247,7 @@ cp vendor/spatie/laravel-permission/database/migrations/create_permission_tables
 You will also need to create another configuration file at `config/auth.php`. Get it on the Laravel repository or just run the following command:
 
 ```bash
-curl -Ls https://raw.githubusercontent.com/laravel/lumen-framework/5.5/config/auth.php -o config/auth.php
+curl -Ls https://raw.githubusercontent.com/laravel/lumen-framework/5.7/config/auth.php -o config/auth.php
 ```
 
 Then, in `bootstrap/app.php`, register the middlewares:
@@ -729,39 +737,39 @@ In your application's tests, if you are not seeding roles and permissions as par
 
 You may discover that it is best to flush this package's cache before seeding, to avoid cache conflict errors. This can be done directly in a seeder class. Here is a sample seeder, which first clears the cache, creates permissions and then assigns permissions to roles (the order of these steps is intentional):
 
-    ```php
-    use Illuminate\Database\Seeder;
-    use Spatie\Permission\Models\Role;
-    use Spatie\Permission\Models\Permission;
+```php
+use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
-    class RolesAndPermissionsSeeder extends Seeder
+class RolesAndPermissionsSeeder extends Seeder
+{
+    public function run()
     {
-        public function run()
-        {
-            // Reset cached roles and permissions
-            $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        // Reset cached roles and permissions
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-            // create permissions
-            Permission::create(['name' => 'edit articles']);
-            Permission::create(['name' => 'delete articles']);
-            Permission::create(['name' => 'publish articles']);
-            Permission::create(['name' => 'unpublish articles']);
+        // create permissions
+        Permission::create(['name' => 'edit articles']);
+        Permission::create(['name' => 'delete articles']);
+        Permission::create(['name' => 'publish articles']);
+        Permission::create(['name' => 'unpublish articles']);
 
-            // create roles and assign created permissions
+        // create roles and assign created permissions
 
-            // this can be done as separate statements
-            $role = Role::create(['name' => 'writer']);
-            $role->givePermissionTo('edit articles');
+        // this can be done as separate statements
+        $role = Role::create(['name' => 'writer']);
+        $role->givePermissionTo('edit articles');
 
-            // or may be done by chaining
-            $role = Role::create(['name' => 'moderator'])
-                ->givePermissionTo(['publish articles', 'unpublish articles']);
+        // or may be done by chaining
+        $role = Role::create(['name' => 'moderator'])
+            ->givePermissionTo(['publish articles', 'unpublish articles']);
 
-            $role = Role::create(['name' => 'super-admin']);
-            $role->givePermissionTo(Permission::all());
-        }
+        $role = Role::create(['name' => 'super-admin']);
+        $role->givePermissionTo(Permission::all());
     }
-    ```
+}
+```
 
 ## Extending
 
@@ -809,6 +817,11 @@ HOWEVER, if you manipulate permission/role data directly in the database instead
 To manually reset the cache for this package, you can run the following in your app code:
 ```php
 $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+```
+
+Or you can use an Artisan command:
+```bash
+php artisan permission:cache-reset
 ```
 
 
