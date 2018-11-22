@@ -8,7 +8,6 @@ use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Role extends Model implements RoleContract
@@ -53,11 +52,10 @@ class Role extends Model implements RoleContract
     /**
      * A role belongs to some users/role having models.
      */
-    public function users(): MorphToMany
+    public function users(): BelongsToMany
     {
         return $this->morphedByMany(
-            // TODO: decide on the right model here!!!
-            \Spatie\Permission\Test\User::class, // TEMP! - getModelForGuard($this->attributes['guard_name']),
+            getProviderModelForGuard(),
             'model',
             config('permission.table_names.model_has_roles'),
             'role_id',

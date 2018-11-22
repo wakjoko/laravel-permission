@@ -7,7 +7,6 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Permission\Exceptions\PermissionAlreadyExists;
@@ -57,11 +56,10 @@ class Permission extends Model implements PermissionContract
     /**
      * A permission belongs to some users/permission things.
      */
-    public function users(): MorphToMany
+    public function users(): BelongsToMany
     {
         return $this->morphedByMany(
-        // TODO: decide on the right model here!!!
-            \Spatie\Permission\Test\User::class, // TEMP! - getModelForGuard($this->attributes['guard_name']),
+            getProviderModelForGuard(),
             'model',
             config('permission.table_names.model_has_permissions'),
             'permission_id',
