@@ -31,10 +31,6 @@ class Role extends Model implements RoleContract
             throw RoleAlreadyExists::create($attributes['name']);
         }
 
-        if (isNotLumen() && app()::VERSION < '5.4') {
-            return parent::create($attributes);
-        }
-
         return static::query()->create($attributes);
     }
 

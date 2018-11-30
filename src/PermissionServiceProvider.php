@@ -24,10 +24,6 @@ class PermissionServiceProvider extends ServiceProvider
                     __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->app->databasePath()."/migrations/{$timestamp}_create_permission_tables.php",
                 ], 'migrations');
             }
-
-            if (app()->version() >= '5.5') {
-                $this->registerMacroHelpers();
-            }
         }
 
         if ($this->app->runningInConsole()) {
