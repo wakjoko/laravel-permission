@@ -60,21 +60,12 @@ our open source projects [on our website](https://spatie.be/opensource).
 
 ### Laravel
 
-This package can be used in Laravel 5.4 or higher. If you are using an older version of Laravel, use v1 of this package.
+This package can be used in Laravel 5.5 or higher. If you are using an older version of Laravel, use v1 of this package.
 
 You can install the package via composer:
 
 ``` bash
 composer require spatie/laravel-permission
-```
-
-Prior to Laravel 5.5 you will need to add the service provider in `config/app.php`:
-
-```php
-'providers' => [
-    // ...
-    Spatie\Permission\PermissionServiceProvider::class,
-];
 ```
 
 You will need to publish [the migration](https://github.com/spatie/laravel-permission/blob/master/database/migrations/create_permission_tables.php.stub) with:
