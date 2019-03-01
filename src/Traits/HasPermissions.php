@@ -101,7 +101,7 @@ trait HasPermissions
                 return $permission;
             }
 
-            return app(Permission::class)->findByName($permission);
+            return $this->getPermissionClass()->findByName($permission);
         }, $permissions);
     }
 
@@ -111,18 +111,18 @@ trait HasPermissions
      * @param string|int|\Spatie\Permission\Contracts\Permission $permission
      *
      * @return bool
-     * @throws PermissionDoesNotExist
+     * @throws \Exception
      */
     public function hasPermissionTo($permission): bool
     {
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {
-            $permission = app(Permission::class)->findByName($permission);
+            $permission = $permissionClass->findByName($permission);
         }
 
         if (is_int($permission)) {
-            $permission = app(Permission::class)->findById($permission);
+            $permission = $permissionClass->findById($permission);
         }
 
         if (! $permission instanceof Permission) {
@@ -136,14 +136,13 @@ trait HasPermissions
      * An alias to hasPermissionTo(), but avoids throwing an exception.
      *
      * @param string|int|\Spatie\Permission\Contracts\Permission $permission
-     * @param string|null $guardName
      *
      * @return bool
      */
-    public function checkPermissionTo($permission, $guardName = null): bool
+    public function checkPermissionTo($permission): bool
     {
         try {
-            return $this->hasPermissionTo($permission, $guardName);
+            return $this->hasPermissionTo($permission);
         } catch (PermissionDoesNotExist $e) {
             return false;
         }
@@ -219,16 +218,14 @@ trait HasPermissions
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {
-            $permission = app(Permission::class)->findByName($permission);
-
+            $permission = $permissionClass->findByName($permission);
             if (! $permission) {
                 return false;
             }
         }
 
         if (is_int($permission)) {
-            $permission = app(Permission::class)->findById($permission);
-
+            $permission = $permissionClass->findById($permission);
             if (! $permission) {
                 return false;
             }
@@ -289,6 +286,7 @@ trait HasPermissions
             ->filter(function ($permission) {
                 return $permission instanceof Permission;
             })
+            ->map->id
             ->all();
 
         $model = $this->getModel();
@@ -364,11 +362,11 @@ trait HasPermissions
         $permissionClass = $this->getPermissionClass();
 
         if (is_numeric($permissions)) {
-            return app(Permission::class)->findById($permissions);
+            return $permissionClass->findById($permissions);
         }
 
         if (is_string($permissions)) {
-            return app(Permission::class)->findByName($permissions);
+            return $permissionClass->findByName($permissions);
         }
 
         if (is_array($permissions)) {

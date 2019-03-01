@@ -62,10 +62,6 @@ abstract class TestCase extends Orchestra
 
         $app['config']->set('view.paths', [__DIR__.'/resources/views']);
 
-        // Set-up admin guard
-        $app['config']->set('auth.guards.admin', ['driver' => 'session', 'provider' => 'admins']);
-        $app['config']->set('auth.providers.admins', ['driver' => 'eloquent', 'model' => Admin::class]);
-
         // Use test User model for users provider
         $app['config']->set('auth.providers.users.model', User::class);
 
@@ -85,11 +81,6 @@ abstract class TestCase extends Orchestra
             $table->increments('id');
             $table->string('email');
             $table->softDeletes();
-        });
-
-        $app['db']->connection()->getSchemaBuilder()->create('admins', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('email');
         });
 
         if (Cache::getStore() instanceof \Illuminate\Cache\DatabaseStore ||

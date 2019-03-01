@@ -23,7 +23,6 @@
   * [Using Blade directives](#using-blade-directives)
   * [Defining a Super-Admin](#defining-a-super-admin)
   * [Best Practices -- roles vs permissions](#best-practices----roles-vs-permissions)
-  * [Using multiple guards](#using-multiple-guards)
   * [Using a middleware](#using-a-middleware)
   * [Using artisan commands](#using-artisan-commands)
 * [Unit Testing](#unit-testing)
@@ -45,8 +44,6 @@ $user->assignRole('writer');
 $role->givePermissionTo('edit articles');
 ```
 
-If you're using multiple guards we've got you covered as well. Every guard will have its own set of permissions and roles that can be assigned to the guard's users. Read about it in the [using multiple guards](#using-multiple-guards) section of the readme.
-
 Because all permissions will be registered on [Laravel's gate](https://laravel.com/docs/5.5/authorization), you can check if a user has a permission with Laravel's default `can` function:
 
 ```php
@@ -63,7 +60,7 @@ our open source projects [on our website](https://spatie.be/opensource).
 
 ### Laravel
 
-This package can be used in Laravel 5.4 or higher. If you are using an older version of Laravel, take a look at [the v1 branch of this package](https://github.com/spatie/laravel-permission/tree/v1).
+This package can be used in Laravel 5.5 or higher.
 
 You can install the package via composer:
 
@@ -71,7 +68,7 @@ You can install the package via composer:
 composer require spatie/laravel-permission
 ```
 
-The service provider will automatically get registered. Or you may manually add the service provider in your `config/app.php` file:
+The service provider will automatically register. Or you may manually add the service provider in your `config/app.php` file:
 
 ```php
 'providers' => [
@@ -95,7 +92,7 @@ After the migration has been published you can create the role- and permission-t
 php artisan migrate
 ```
 
-You can publish the config file with:
+If you want to customize the configuration, you can publish the config file with:
 
 ```bash
 php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="config"
@@ -294,22 +291,6 @@ class User extends Authenticatable
 }
 ```
 
-> - note that if you need to use `HasRoles` trait with another model ex.`Page` you will also need to add `protected $guard_name = 'web';` as well to that model or you would get an error
->
->```php
->use Illuminate\Database\Eloquent\Model;
->use Spatie\Permission\Traits\HasRoles;
->
->class Page extends Model
->{
->    use HasRoles;
->
->    protected $guard_name = 'web'; // or whatever guard you want to use
->
->    // ...
->}
->```
-
 This package allows for users to be associated with permissions and roles. Every role is associated with multiple permissions.
 A `Role` and a `Permission` are regular Eloquent models. They require a `name` and can be created like this:
 
@@ -342,8 +323,6 @@ A permission can be removed from a role using 1 of these methods:
 $role->revokePermissionTo($permission);
 $permission->removeRole($role);
 ```
-
-If you're using multiple guards the `guard_name` attribute needs to be set as well. Read about it in the [using multiple guards](#using-multiple-guards) section of the readme.
 
 The `HasRoles` trait adds Eloquent relationships to your models, which can be accessed directly or used as a base query:
 
@@ -435,8 +414,8 @@ You may also pass integers to lookup by permission id
 $user->hasAnyPermission(['edit articles', 1, 5]);
 ```
 
-Saved permissions will be registered with the `Illuminate\Auth\Access\Gate` class for the default guard. So you can
-check if a user has a permission with Laravel's default `can` function:
+Saved permissions will be registered with the `Illuminate\Auth\Access\Gate` class. 
+So you can check if a user has a permission with Laravel's default `can` function:
 
 ```php
 $user->can('edit articles');
@@ -551,8 +530,6 @@ the second will be a collection with the `edit article` permission and the third
 
 ### Using Blade directives
 This package also adds Blade directives to verify whether the currently logged in user has all or any of a given list of roles. 
-
-Optionally you can pass in the `guard` that the check will be performed on as a second argument.
 
 #### Blade and Roles
 Check for a specific role:
@@ -737,20 +714,10 @@ php artisan permission:create-role writer
 php artisan permission:create-permission "edit articles"
 ```
 
-When creating permissions/roles for specific guards you can specify the guard names as a second argument:
-
-```bash
-php artisan permission:create-role writer web
-```
-
-```bash
-php artisan permission:create-permission "edit articles" web
-```
-
 When creating roles you can also create and link permissions at the same time:
 
 ```bash
-php artisan permission:create-role writer web "create articles|edit articles"
+php artisan permission:create-role writer "create articles|edit articles"
 ```
 
 
@@ -831,7 +798,7 @@ php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvid
 
 Role and Permission data are cached to speed up performance.
 
-While we recommend not changing the cache "key" name, if you wish to alter the expiration time you may do so in the `config/permission.php` file, in the `cache` array. Note that as of v2.26.0 the `cache` entry here is now an array, and `expiration_time` is a sub-array entry.
+While we recommend not changing the cache "key" name, if you wish to alter the expiration time you may do so in the `config/permission.php` file, in the `cache` array.
 
 When you use the built-in functions for manipulating roles and permissions, the cache is automatically reset for you, and relations are automatically reloaded for the current model record:
 

@@ -14,7 +14,7 @@ interface Role
     public function permissions(): BelongsToMany;
 
     /**
-     * Find a role by its name and guard name.
+     * Find a role by its name.
      *
      * @param string $name
      *
@@ -25,7 +25,7 @@ interface Role
     public static function findByName(string $name): self;
 
     /**
-     * Find a role by its id and guard name.
+     * Find a role by its id.
      *
      * @param int $id
      *
@@ -36,7 +36,7 @@ interface Role
     public static function findById(int $id): self;
 
     /**
-     * Find or create a role by its name and guard name.
+     * Find or create a role by its name.
      *
      * @param string $name
      *

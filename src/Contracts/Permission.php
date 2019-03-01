@@ -36,7 +36,7 @@ interface Permission
     public static function findById(int $id): self;
 
     /**
-     * Find or Create a permission by its name and guard name.
+     * Find or Create a permission by its name.
      *
      * @param string $name
      *

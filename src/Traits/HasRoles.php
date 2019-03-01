@@ -107,6 +107,7 @@ trait HasRoles
             ->filter(function ($role) {
                 return $role instanceof Role;
             })
+            ->map->id
             ->all();
 
         $model = $this->getModel();
@@ -256,11 +257,11 @@ trait HasRoles
         $roleClass = $this->getRoleClass();
 
         if (is_numeric($role)) {
-            return app($roleClass)->findById($role);
+            return $roleClass->findById($role);
         }
 
         if (is_string($role)) {
-            return app($roleClass)->findByName($role);
+            return $roleClass->findByName($role);
         }
 
         return $role;

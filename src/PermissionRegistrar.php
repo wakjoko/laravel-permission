@@ -151,7 +151,7 @@ class PermissionRegistrar
      */
     public function getPermissionClass(): Permission
     {
-        return app($this->permissionClass);
+        return app()[$this->permissionClass];
     }
 
     /**
@@ -161,7 +161,7 @@ class PermissionRegistrar
      */
     public function getRoleClass(): Role
     {
-        return app($this->roleClass);
+        return app()[$this->roleClass];
     }
 
     /**

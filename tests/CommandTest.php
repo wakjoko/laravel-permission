@@ -5,6 +5,7 @@ namespace Spatie\Permission\Test;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Exceptions\PermissionAlreadyExists;
 
 class CommandTest extends TestCase
 {
@@ -52,6 +53,8 @@ class CommandTest extends TestCase
     /** @test */
     public function it_can_create_a_permission_without_duplication()
     {
+        $this->expectException(PermissionAlreadyExists::class);
+
         Artisan::call('permission:create-permission', ['name' => 'new-permission']);
         Artisan::call('permission:create-permission', ['name' => 'new-permission']);
 

@@ -23,9 +23,7 @@ class PermissionServiceProvider extends ServiceProvider
                 __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->getMigrationFileName($filesystem),
             ], 'migrations');
 
-            if (app()->version() >= '5.5') {
-                $this->registerMacroHelpers();
-            }
+            $this->registerMacroHelpers();
         }
 
         if ($this->app->runningInConsole()) {
@@ -71,10 +69,8 @@ class PermissionServiceProvider extends ServiceProvider
             $bladeCompiler->directive('role', function ($role) {
                 return "<?php if(auth()->check() && auth()->user()->hasRole({$role})): ?>";
             });
-            $bladeCompiler->directive('elserole', function ($arguments) {
-                list($role, $guard) = explode(',', $arguments.',');
-
-                return "<?php elseif(auth({$guard})->check() && auth({$guard})->user()->hasRole({$role})): ?>";
+            $bladeCompiler->directive('elserole', function ($role) {
+                return "<?php elseif(auth()->check() && auth()->user()->hasRole({$role})): ?>";
             });
             $bladeCompiler->directive('endrole', function () {
                 return '<?php endif; ?>';
@@ -101,10 +97,8 @@ class PermissionServiceProvider extends ServiceProvider
                 return '<?php endif; ?>';
             });
 
-            $bladeCompiler->directive('unlessrole', function ($arguments) {
-                list($role, $guard) = explode(',', $arguments.',');
-
-                return "<?php if(!auth({$guard})->check() || ! auth({$guard})->user()->hasRole({$role})): ?>";
+            $bladeCompiler->directive('unlessrole', function ($role) {
+                return "<?php if(!auth()->check() || ! auth()->user()->hasRole({$role})): ?>";
             });
             $bladeCompiler->directive('endunlessrole', function () {
                 return '<?php endif; ?>';

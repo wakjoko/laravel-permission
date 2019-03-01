@@ -9,7 +9,6 @@ use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Exceptions\RoleAlreadyExists;
 use Spatie\Permission\Contracts\Role as RoleContract;
 use Spatie\Permission\Traits\RefreshesPermissionCache;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Role extends Model implements RoleContract
@@ -28,12 +27,9 @@ class Role extends Model implements RoleContract
 
     public static function create(array $attributes = [])
     {
+        // TODO: Remove this exception and fall back to Laravel's default?
         if (static::where('name', $attributes['name'])->first()) {
             throw RoleAlreadyExists::create($attributes['name']);
-        }
-
-        if (isNotLumen() && app()::VERSION < '5.4') {
-            return parent::create($attributes);
         }
 
         return static::query()->create($attributes);
@@ -55,7 +51,7 @@ class Role extends Model implements RoleContract
     /**
      * A role belongs to some users/role having models.
      */
-    public function users(): MorphToMany
+    public function users(): BelongsToMany
     {
         return $this->morphedByMany(
             User::class, // TEMP - getModelForGuard($this->attributes['guard_name']),
@@ -109,7 +105,7 @@ class Role extends Model implements RoleContract
         $role = static::where('name', $name)->first();
 
         if (! $role) {
-            return static::create(['name' => $name]);
+            return static::query()->create(['name' => $name]);
         }
 
         return $role;
@@ -127,11 +123,11 @@ class Role extends Model implements RoleContract
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {
-            $permission = app(Permission::class)->findByName($permission);
+            $permission = $permissionClass->findByName($permission);
         }
 
         if (is_int($permission)) {
-            $permission = app(Permission::class)->findById($permission);
+            $permission = $permissionClass->findById($permission);
         }
 
         return $this->permissions->contains('id', $permission->id);
