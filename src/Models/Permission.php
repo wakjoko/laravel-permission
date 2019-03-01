@@ -53,7 +53,9 @@ class Permission extends Model implements PermissionContract
     {
         return $this->belongsToMany(
             config('permission.models.role'),
-            config('permission.table_names.role_has_permissions')
+            config('permission.table_names.role_has_permissions'),
+            'permission_id',
+            'role_id'
         );
     }
 
@@ -67,7 +69,7 @@ class Permission extends Model implements PermissionContract
             'model',
             config('permission.table_names.model_has_permissions'),
             'permission_id',
-            'model_id'
+            config('permission.column_names.model_morph_key')
         );
     }
 
@@ -138,8 +140,8 @@ class Permission extends Model implements PermissionContract
     /**
      * Get the current cached permissions.
      */
-    protected static function getPermissions(): Collection
+    protected static function getPermissions(array $params = []): Collection
     {
-        return app(PermissionRegistrar::class)->getPermissions();
+        return app(PermissionRegistrar::class)->getPermissions($params);
     }
 }

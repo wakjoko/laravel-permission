@@ -46,7 +46,9 @@ class Role extends Model implements RoleContract
     {
         return $this->belongsToMany(
             config('permission.models.permission'),
-            config('permission.table_names.role_has_permissions')
+            config('permission.table_names.role_has_permissions'),
+            'role_id',
+            'permission_id'
         );
     }
 
@@ -60,7 +62,7 @@ class Role extends Model implements RoleContract
             'model',
             config('permission.table_names.model_has_roles'),
             'role_id',
-            'model_id'
+            config('permission.column_names.model_morph_key')
         );
     }
 
@@ -122,6 +124,8 @@ class Role extends Model implements RoleContract
      */
     public function hasPermissionTo($permission): bool
     {
+        $permissionClass = $this->getPermissionClass();
+
         if (is_string($permission)) {
             $permission = app(Permission::class)->findByName($permission);
         }
