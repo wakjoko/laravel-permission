@@ -130,6 +130,8 @@ return [
          */
 
         'role' => Spatie\Permission\Models\Role::class,
+		
+		'group' => Spatie\Permission\Models\Group::class,
 
     ],
 
@@ -174,6 +176,10 @@ return [
          */
 
         'role_has_permissions' => 'role_has_permissions',
+		
+		'groups' => 'groups',
+		'model_has_groups' => 'model_has_groups',
+		'group_has_roles' => 'group_has_roles',
     ],
 
     'column_names' => [
@@ -238,7 +244,7 @@ return [
 You can install the package via Composer:
 
 ``` bash
-composer require spatie/laravel-permission
+composer require wakjoko/laravel-permission
 ```
 
 Copy the required files:
@@ -262,6 +268,7 @@ $app->routeMiddleware([
     'auth'       => App\Http\Middleware\Authenticate::class,
     'permission' => Spatie\Permission\Middlewares\PermissionMiddleware::class,
     'role'       => Spatie\Permission\Middlewares\RoleMiddleware::class,
+	'group'       => Spatie\Permission\Middlewares\GroupMiddleware::class,
 ]);
 ```
 
@@ -281,29 +288,29 @@ php artisan migrate
 
 ## Usage
 
-First, add the `Spatie\Permission\Traits\HasRoles` trait to your `User` model(s):
+First, add the `Spatie\Permission\Traits\HasGroups` trait to your `User` model(s):
 
 ```php
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Traits\HasGroups;
 
 class User extends Authenticatable
 {
-    use HasRoles;
+    use HasGroups;
 
     // ...
 }
 ```
 
-> - note that if you need to use `HasRoles` trait with another model ex.`Page` you will also need to add `protected $guard_name = 'web';` as well to that model or you would get an error
+> - note that if you need to use `HasGroups` trait with another model ex.`Page` you will also need to add `protected $guard_name = 'web';` as well to that model or you would get an error
 >
 >```php
 >use Illuminate\Database\Eloquent\Model;
->use Spatie\Permission\Traits\HasRoles;
+>use Spatie\Permission\Traits\HasGroups;
 >
 >class Page extends Model
 >{
->    use HasRoles;
+>    use HasGroups;
 >
 >    protected $guard_name = 'web'; // or whatever guard you want to use
 >

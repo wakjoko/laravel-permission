@@ -1,20 +1,21 @@
 {
     "name": "spatie/laravel-permission",
-    "description": "Permission handling for Laravel 5.4 and up",
+    "description": "Adds Grouping layer to Permission handling for Laravel 5.4 and up",
     "keywords": [
         "spatie",
         "laravel",
         "permission",
         "acl",
-        "security"
+        "security",
+		"group"
     ],
-    "homepage": "https://github.com/spatie/laravel-permission",
+    "homepage": "https://github.com/wakjoko/laravel-permission",
     "license": "MIT",
     "authors": [
         {
-            "name": "Freek Van der Herten",
-            "email": "freek@spatie.be",
-            "homepage": "https://spatie.be",
+            "name": "Wakjoko",
+            "email": "wakjoko@gmail.com",
+            "homepage": "",
             "role": "Developer"
         }
     ],
