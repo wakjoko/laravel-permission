@@ -1,5 +1,5 @@
 {
-    "name": "spatie/laravel-permission",
+    "name": "wakjoko/laravel-permission",
     "description": "Adds Grouping layer to Permission handling for Laravel 5.4 and up",
     "keywords": [
         "spatie",
