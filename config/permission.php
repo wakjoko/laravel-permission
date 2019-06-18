@@ -4,7 +4,16 @@ return [
 
     'models' => [
 
-        /*
+        
+		/*
+		start customization by wakjoko
+		*/
+		'group' => Spatie\Permission\Models\Group::class,
+		/*
+		end customization by wakjoko
+		*/
+		
+		/*
          * When using the "HasPermissions" trait from this package, we need to know which
          * Eloquent model should be used to retrieve your permissions. Of course, it
          * is often just the "Permission" model but you may use whatever you like.
@@ -25,12 +34,25 @@ return [
          */
 
         'role' => Spatie\Permission\Models\Role::class,
+		
 
     ],
 
     'table_names' => [
 
         /*
+		start customization by wakjoko
+		*/
+		'groups' => 'groups',
+		
+		'model_has_groups' => 'model_has_groups',
+		
+		'group_has_roles' => 'group_has_roles',
+		/*
+		end customization by wakjoko
+		*/
+		
+		/*
          * When using the "HasRoles" trait from this package, we need to know which
          * table should be used to retrieve your roles. We have chosen a basic
          * default value but you may easily change it to any table you like.

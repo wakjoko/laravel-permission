@@ -5,9 +5,11 @@ namespace Spatie\Permission;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Role;
+use Spatie\Permission\Contracts\Group;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Spatie\Permission\Contracts\Permission;
 use Illuminate\Contracts\Auth\Access\Authorizable;
+use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class PermissionRegistrar
@@ -26,6 +28,9 @@ class PermissionRegistrar
 
     /** @var string */
     protected $roleClass;
+	
+	/** @var string */
+    protected $groupClass;
 
     /** @var \Illuminate\Support\Collection */
     protected $permissions;
@@ -50,6 +55,7 @@ class PermissionRegistrar
         $this->gate = $gate;
         $this->permissionClass = config('permission.models.permission');
         $this->roleClass = config('permission.models.role');
+		$this->groupClass = config('permission.models.group');
 
         $this->cacheManager = $cacheManager;
         $this->initializeCache();
@@ -99,6 +105,13 @@ class PermissionRegistrar
     {
         $this->gate->before(function (Authorizable $user, string $ability) {
             try {
+                if (method_exists($user, 'hasRoleTo')) {
+                    return $user->hasRoleTo($ability) ?: null;
+                }
+            } catch (RoleDoesNotExist $e) {
+            }
+			
+			try {
                 if (method_exists($user, 'hasPermissionTo')) {
                     return $user->hasPermissionTo($ability) ?: null;
                 }
@@ -130,7 +143,7 @@ class PermissionRegistrar
         if ($this->permissions === null) {
             $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
                 return $this->getPermissionClass()
-                    ->with('roles')
+                    ->with('roles','roles.group')
                     ->get();
             });
         }
@@ -162,6 +175,16 @@ class PermissionRegistrar
     public function getRoleClass(): Role
     {
         return app($this->roleClass);
+    }
+	
+	/**
+     * Get an instance of the group class.
+     *
+     * @return \Spatie\Permission\Contracts\Group
+     */
+    public function getGroupClass(): Group
+    {
+        return app($this->groupClass);
     }
 
     /**

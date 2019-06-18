@@ -8,6 +8,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
 use Spatie\Permission\Contracts\Role as RoleContract;
+use Spatie\Permission\Contracts\Group as GroupContract;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 
 class PermissionServiceProvider extends ServiceProvider
@@ -31,7 +32,8 @@ class PermissionServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 Commands\CacheReset::class,
-                Commands\CreateRole::class,
+                Commands\CreateGroup::class,
+				Commands\CreateRole::class,
                 Commands\CreatePermission::class,
                 Commands\Show::class,
             ]);
@@ -64,6 +66,7 @@ class PermissionServiceProvider extends ServiceProvider
 
         $this->app->bind(PermissionContract::class, $config['permission']);
         $this->app->bind(RoleContract::class, $config['role']);
+		$this->app->bind(GroupContract::class, $config['group']);
     }
 
     protected function registerBladeExtensions()
@@ -123,7 +126,19 @@ class PermissionServiceProvider extends ServiceProvider
 
     protected function registerMacroHelpers()
     {
-        Route::macro('role', function ($roles = []) {
+        Route::macro('group', function ($groups = []) {
+            if (! is_array($groups)) {
+                $groups = [$groups];
+            }
+
+            $groups = implode('|', $groups);
+
+            $this->middleware("group:$groups");
+
+            return $this;
+        });
+		
+		Route::macro('role', function ($roles = []) {
             if (! is_array($roles)) {
                 $roles = [$roles];
             }

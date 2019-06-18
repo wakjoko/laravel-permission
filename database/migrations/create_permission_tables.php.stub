@@ -29,6 +29,19 @@ class CreatePermissionTables extends Migration
             $table->string('guard_name');
             $table->timestamps();
         });
+		
+		/*
+		start customization by wakjoko
+		*/
+		Schema::create($tableNames['groups'], function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('guard_name');
+            $table->timestamps();
+        });
+		/*
+		end customization by wakjoko
+		*/
 
         Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $columnNames) {
             $table->unsignedInteger('permission_id');
@@ -61,6 +74,28 @@ class CreatePermissionTables extends Migration
             $table->primary(['role_id', $columnNames['model_morph_key'], 'model_type'],
                     'model_has_roles_role_model_type_primary');
         });
+		
+		/*
+		start customization by wakjoko
+		*/
+		Schema::create($tableNames['model_has_groups'], function (Blueprint $table) use ($tableNames, $columnNames) {
+            $table->unsignedInteger('role_id');
+
+            $table->string('model_type');
+            $table->unsignedBigInteger($columnNames['model_morph_key']);
+            $table->index([$columnNames['model_morph_key'], 'model_type', ]);
+
+            $table->foreign('group_id')
+                ->references('id')
+                ->on($tableNames['group'])
+                ->onDelete('cascade');
+
+            $table->primary(['group_id', $columnNames['model_morph_key'], 'model_type'],
+                    'model_has_groups_group_model_type_primary');
+        });
+		/*
+		end customization by wakjoko
+		*/
 
         Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames) {
             $table->unsignedInteger('permission_id');
@@ -98,5 +133,7 @@ class CreatePermissionTables extends Migration
         Schema::drop($tableNames['model_has_permissions']);
         Schema::drop($tableNames['roles']);
         Schema::drop($tableNames['permissions']);
+		Schema::drop($tableNames['group_has_roles']);
+		Schema::drop($tableNames['model_has_groups']);
     }
 }

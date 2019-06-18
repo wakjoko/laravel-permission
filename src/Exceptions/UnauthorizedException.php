@@ -6,11 +6,28 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UnauthorizedException extends HttpException
 {
-    private $requiredRoles = [];
+    private $requiredGroups = [];
+	
+	private $requiredRoles = [];
 
     private $requiredPermissions = [];
 
-    public static function forRoles(array $roles): self
+    public static function forGroups(array $groups): self
+    {
+        $message = 'User does not have the right groups.';
+
+        if (config('permission.display_permission_in_exception')) {
+            $permStr = implode(', ', $groups);
+            $message = 'User does not have the right groups. Necessary groups are '.$permStr;
+        }
+
+        $exception = new static(403, $message, null, []);
+        $exception->requiredGroups = $groups;
+
+        return $exception;
+    }
+	
+	public static function forRoles(array $roles): self
     {
         $message = 'User does not have the right roles.';
 
@@ -40,7 +57,22 @@ class UnauthorizedException extends HttpException
         return $exception;
     }
 
-    public static function forRolesOrPermissions(array $rolesOrPermissions): self
+    public static function forGroupsOrRolesOrPermissions(array $groupsOrRolesOrPermissions): self
+    {
+        $message = 'User does not have any of the necessary access rights.';
+
+        if (config('permission.display_permission_in_exception') && config('permission.display_role_in_exception') && config('permission.display_group_in_exception')) {
+            $permStr = implode(', ', $groupsOrRolesOrPermissions);
+            $message = 'User does not have the right permissions. Necessary permissions are '.$permStr;
+        }
+
+        $exception = new static(403, $message, null, []);
+        $exception->requiredPermissions = $groupsOrRolesOrPermissions;
+
+        return $exception;
+    }
+	
+	public static function forRolesOrPermissions(array $rolesOrPermissions): self
     {
         $message = 'User does not have any of the necessary access rights.';
 
@@ -60,7 +92,12 @@ class UnauthorizedException extends HttpException
         return new static(403, 'User is not logged in.', null, []);
     }
 
-    public function getRequiredRoles(): array
+    public function getRequiredGroups(): array
+    {
+        return $this->requiredGroups;
+    }
+	
+	public function getRequiredRoles(): array
     {
         return $this->requiredRoles;
     }
